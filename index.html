@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CONICS Interactive Guide | CONICS1</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)'], ['$', '$']], displayMath: [['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root{
+      --navy:#06142f;
+      --navy2:#0b214d;
+      --navy3:#102f68;
+      --glass:rgba(255,255,255,.10);
+      --glass2:rgba(255,255,255,.16);
+      --gold:#ffd166;
+      --gold2:#ffb703;
+      --cyan:#4cc9f0;
+      --green:#80ed99;
+      --pink:#ff70a6;
+      --purple:#bdb2ff;
+      --orange:#f77f00;
+      --white:#f8fbff;
+      --muted:#c7d7ff;
+      --danger:#ff6b6b;
+      --ok:#2dd4bf;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;overflow:hidden;font-family:"Trebuchet MS", "Segoe UI", Arial, sans-serif;background:#020817;color:var(--white)}
+    body:before{
+      content:"";position:fixed;inset:0;z-index:-3;
+      background:
+        radial-gradient(circle at 20% 12%, rgba(76,201,240,.24), transparent 28%),
+        radial-gradient(circle at 88% 20%, rgba(255,209,102,.20), transparent 24%),
+        radial-gradient(circle at 75% 86%, rgba(189,178,255,.18), transparent 28%),
+        linear-gradient(135deg,#041027 0%,#071b42 45%,#06142f 100%);
+    }
+    body:after{
+      content:"";position:fixed;inset:0;z-index:-2;opacity:.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.09) 1px, transparent 1px);
+      background-size:34px 34px;
+      mask-image:radial-gradient(circle at center, black, transparent 78%);
+    }
+    .app{width:100vw;height:100vh;position:relative;padding:24px;display:flex;align-items:center;justify-content:center}
+    .screen{display:none;width:min(1400px,96vw);height:min(790px,94vh);border:1px solid rgba(255,255,255,.16);border-radius:28px;background:linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.055));box-shadow:0 28px 80px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.08);backdrop-filter:blur(10px);position:relative;overflow:hidden;padding:28px}
+    .screen.active{display:block;animation:fade .25s ease-out}
+    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .brand{position:absolute;left:34px;bottom:18px;color:rgba(255,255,255,.72);font-size:15px;letter-spacing:.3px}
+    .topbar{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .titleSmall{font-size:30px;font-weight:900;letter-spacing:.8px;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.35)}
+    .pill{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:10px 16px;background:rgba(255,255,255,.09);color:var(--muted);font-weight:700}
+    .btn{border:0;border-radius:18px;padding:14px 22px;font-size:18px;font-weight:900;cursor:pointer;color:#07142f;background:linear-gradient(180deg,var(--gold),var(--gold2));box-shadow:0 9px 0 rgba(159,105,0,.75),0 16px 28px rgba(0,0,0,.24);transition:.14s transform,.14s filter,.14s box-shadow}
+    .btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+    .btn:active{transform:translateY(5px);box-shadow:0 4px 0 rgba(159,105,0,.75),0 10px 20px rgba(0,0,0,.20)}
+    .btn.secondary{color:#fff;background:linear-gradient(180deg,#1b376f,#0e2558);box-shadow:0 8px 0 rgba(0,0,0,.35),0 16px 28px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.16)}
+    .btn.cyan{background:linear-gradient(180deg,#7be7ff,#4cc9f0);box-shadow:0 9px 0 rgba(0,110,150,.75),0 16px 28px rgba(0,0,0,.24)}
+    .btn.green{background:linear-gradient(180deg,#b7ffca,#80ed99);box-shadow:0 9px 0 rgba(0,120,65,.75),0 16px 28px rgba(0,0,0,.24)}
+    .btn.pink{background:linear-gradient(180deg,#ffc2dc,#ff70a6);box-shadow:0 9px 0 rgba(140,25,78,.75),0 16px 28px rgba(0,0,0,.24)}
+    .btn.purple{background:linear-gradient(180deg,#ded8ff,#bdb2ff);box-shadow:0 9px 0 rgba(85,72,155,.75),0 16px 28px rgba(0,0,0,.24)}
+    .btn.small{padding:10px 16px;font-size:15px;border-radius:14px;box-shadow:0 6px 0 rgba(159,105,0,.75),0 10px 18px rgba(0,0,0,.20)}
+    .opening{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;height:100%}
+    .heroLeft{padding:50px 28px 36px 44px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
+    .badge{display:inline-flex;align-items:center;gap:10px;width:max-content;color:var(--gold);border:1px solid rgba(255,209,102,.35);background:rgba(255,209,102,.09);padding:10px 16px;border-radius:999px;font-weight:900;letter-spacing:.9px;margin-bottom:22px}
+    .mainTitle{font-size:92px;line-height:.92;margin:0;font-weight:1000;letter-spacing:3px;background:linear-gradient(180deg,#ffffff 5%,#fff0bf 45%,#ffd166 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 20px 42px rgba(0,0,0,.22)}
+    .subtitle{font-size:28px;line-height:1.35;margin:18px 0 18px;color:#e8f1ff;font-weight:800}
+    .desc{font-size:20px;line-height:1.55;color:var(--muted);max-width:640px;margin:0 0 28px}
+    .heroBtns{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+    .heroRight{position:relative;display:flex;align-items:center;justify-content:center;padding:20px}
+    .orb{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,#ffffff18 0 25%,#4cc9f018 26% 45%,transparent 46%);filter:drop-shadow(0 20px 50px rgba(0,0,0,.25));animation:float 4.5s ease-in-out infinite}
+    @keyframes float{50%{transform:translateY(-10px) rotate(1deg)}}
+    .heroCard{width:560px;height:560px;border-radius:34px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(150deg,rgba(255,255,255,.13),rgba(255,255,255,.05));box-shadow:0 30px 80px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .heroCard canvas{width:100%;height:100%}
+    .menuGrid{height:calc(100% - 92px);display:grid;grid-template-columns:repeat(2,1fr);gap:20px;padding:6px 4px 42px}
+    .menuCard{border-radius:26px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.055));padding:26px;position:relative;overflow:hidden;cursor:pointer;transition:.18s transform,.18s border,.18s background;display:grid;grid-template-columns:1fr 210px;gap:18px;align-items:center}
+    .menuCard:hover{transform:translateY(-4px);border-color:rgba(255,209,102,.6);background:linear-gradient(145deg,rgba(255,255,255,.17),rgba(255,255,255,.075))}
+    .menuCard h2{font-size:38px;margin:0 0 8px;color:#fff}
+    .menuCard p{font-size:18px;line-height:1.45;color:var(--muted);margin:0}
+    .miniCanvas{width:210px;height:160px;border-radius:18px;background:rgba(2,8,23,.42);border:1px solid rgba(255,255,255,.12)}
+    .topicLayout{height:calc(100% - 92px);display:grid;grid-template-columns:300px 1fr;gap:20px;padding-bottom:38px}
+    .sidePanel{border-radius:24px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);padding:18px;display:flex;flex-direction:column;gap:12px}
+    .sidePanel .topicBtn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.09);color:#fff;border-radius:16px;padding:13px 14px;text-align:left;font-size:16px;font-weight:900;cursor:pointer}
+    .sidePanel .topicBtn.active{background:linear-gradient(180deg,var(--gold),var(--gold2));color:#07142f;border-color:transparent}
+    .contentPanel{border-radius:24px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.075);padding:22px;overflow:hidden;display:grid;grid-template-columns:1.02fr .98fr;gap:20px}
+    .lessonText{min-width:0;overflow:auto;padding-right:4px}
+    .lessonText h1{font-size:42px;margin:0 0 10px;color:#fff}
+    .lessonText h3{font-size:23px;color:var(--gold);margin:22px 0 8px}
+    .lessonText p,.lessonText li{font-size:19px;line-height:1.48;color:#e8f1ff}
+    .lessonText ul{padding-left:24px;margin-top:8px}
+    .formulaBox{border:1px solid rgba(255,209,102,.33);background:rgba(255,209,102,.09);border-radius:20px;padding:15px 18px;font-size:22px;margin:14px 0;color:#fff;text-align:center}
+    .graphPanel{border-radius:24px;background:rgba(2,8,23,.42);border:1px solid rgba(255,255,255,.12);padding:12px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;min-width:0}
+    .graphPanel canvas{display:block;width:min(100%,560px);aspect-ratio:14/11;height:auto;flex-shrink:0;border-radius:18px;background:#071733;border:1px solid rgba(255,255,255,.13)}
+    .graphLabel{font-size:17px;color:var(--muted);font-weight:800;text-align:center}
+    .practiceArea{height:calc(100% - 92px);display:flex;flex-direction:column;gap:10px;padding-bottom:42px}
+    .practiceLayout{flex:1;min-height:0;display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+    .questionNav{height:38px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;overflow:hidden;padding:2px 8px}
+    .qNavBtn{width:27px;height:27px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.09);color:#fff;font-size:12px;font-weight:800;cursor:pointer;line-height:1}
+    .qNavBtn:hover{border-color:rgba(255,209,102,.7);background:rgba(255,209,102,.15)}
+    .qNavBtn.active{background:linear-gradient(180deg,var(--gold),var(--gold2));color:#07142f;border-color:transparent}
+    .qNavBtn.done{background:rgba(45,212,191,.22);border-color:rgba(45,212,191,.65)}
+    .qNavBtn.missed{background:rgba(255,107,107,.20);border-color:rgba(255,107,107,.65)}
+    .questionBox,.choicesBox{border-radius:25px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);padding:26px;overflow:auto}
+    .qMeta{font-size:17px;font-weight:900;color:var(--gold);margin-bottom:14px}
+    .qText{font-size:29px;line-height:1.38;color:#fff;font-weight:400;margin:0 0 20px}
+    .choice{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.09);color:#fff;border-radius:18px;padding:16px 18px;margin:12px 0;font-size:21px;cursor:pointer;font-weight:400;line-height:1.35}
+    .choice:hover{border-color:rgba(255,209,102,.65);background:rgba(255,209,102,.10)}
+    .choice.correct{background:rgba(45,212,191,.22);border-color:rgba(45,212,191,.75)}
+    .choice.wrong{background:rgba(255,107,107,.20);border-color:rgba(255,107,107,.70)}
+    .feedback{min-height:70px;margin-top:16px;font-size:21px;line-height:1.35;font-weight:500}
+    .feedback.ok{color:var(--green)}.feedback.no{color:var(--danger)}.feedback span{font-weight:800}
+    .practiceBtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+    .resultCard{height:calc(100% - 92px);display:flex;align-items:center;justify-content:center;text-align:center;padding-bottom:40px}
+    .scoreBox{max-width:760px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.09);border-radius:32px;padding:46px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
+    .scoreBox h1{font-size:56px;margin:0 0 12px;color:var(--gold)}
+    .scoreBox p{font-size:24px;line-height:1.45;color:#e8f1ff}
+    .navBtns{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+    .tagRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.tag{font-size:15px;font-weight:900;color:#06142f;background:var(--gold);border-radius:999px;padding:7px 10px}
+    @media(max-width:1000px){.opening,.contentPanel,.practiceLayout{grid-template-columns:1fr}.heroRight{display:none}.mainTitle{font-size:68px}.menuGrid{grid-template-columns:1fr}.topicLayout{grid-template-columns:1fr}.sidePanel{flex-direction:row;overflow:auto}.screen{overflow:auto}.app{overflow:auto;height:auto;min-height:100vh}.screen{height:auto;min-height:94vh}.brand{position:static;margin-top:8px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section id="opening" class="screen active">
+      <div class="opening">
+        <div class="heroLeft">
+          <div class="badge">✦ DELTA MATEMÁTICA INTERACTIVE GUIDE</div>
+          <h1 class="mainTitle">CONICS</h1>
+          <div class="subtitle">Circle • Parabola • Ellipse • Hyperbola</div>
+          <p class="desc">Explore the four classic conic sections through clean formulas, visual graphs, guided lessons, and practice questions designed for classroom projection.</p>
+          <div class="heroBtns">
+            <button class="btn" onclick="showScreen('menu')">START</button>
+            <button class="btn secondary" onclick="showScreen('about')">WHAT ARE CONICS?</button>
+          </div>
+          <div class="tagRow">
+            <span class="tag">Graphing</span><span class="tag">Equations</span><span class="tag">Visual Learning</span><span class="tag">Practice</span>
+          </div>
+        </div>
+        <div class="heroRight">
+          <div class="orb"></div>
+          <div class="heroCard"><canvas id="heroCanvas" width="560" height="560"></canvas></div>
+        </div>
+      </div>
+      <div class="brand">© 2026 Delta Matemática | Created by Luis Ramos Jr. All Rights Reserved.</div>
+    </section>
+
+    <section id="about" class="screen">
+      <div class="topbar"><div class="titleSmall">What are Conics?</div><div class="navBtns"><button class="btn secondary small" onclick="showScreen('opening')">BACK</button><button class="btn small" onclick="showScreen('menu')">MAIN MENU</button></div></div>
+      <div class="contentPanel" style="height:calc(100% - 92px);padding-bottom:38px">
+        <div class="lessonText">
+          <h1>Conic Sections</h1>
+          <p>A conic section is a curve formed when a plane cuts a cone. The main conics are the circle, parabola, ellipse, and hyperbola.</p>
+          <h3>Big idea</h3>
+          <p>Each conic has its own shape, equation, and important parts. In this guide, we focus on recognizing the shape and reading its equation from a graph.</p>
+          <div class="formulaBox">Circle • Parabola • Ellipse • Hyperbola</div>
+          <p>Use the menu to study each conic one at a time. Each topic includes a short lesson, a graph, and practice questions.</p>
+        </div>
+        <div class="graphPanel"><canvas id="aboutCanvas" width="560" height="440"></canvas><div class="graphLabel">A cone can be sliced in different ways to produce different curves.</div></div>
+      </div>
+      <div class="brand">© 2026 Delta Matemática | Created by Luis Ramos Jr. All Rights Reserved.</div>
+    </section>
+
+    <section id="menu" class="screen">
+      <div class="topbar"><div class="titleSmall">CONICS Main Menu</div><div class="navBtns"><span class="pill">Choose a topic</span><button class="btn secondary small" onclick="showScreen('opening')">HOME</button></div></div>
+      <div class="menuGrid">
+        <div class="menuCard" onclick="openTopic('circle')"><div><h2>Circle</h2><p>Center, radius, diameter, and the standard equation of a circle.</p></div><canvas class="miniCanvas" id="miniCircle" width="210" height="160"></canvas></div>
+        <div class="menuCard" onclick="openTopic('parabola')"><div><h2>Parabola</h2><p>Vertex, axis of symmetry, opening direction, and basic graph matching.</p></div><canvas class="miniCanvas" id="miniParabola" width="210" height="160"></canvas></div>
+        <div class="menuCard" onclick="openTopic('ellipse')"><div><h2>Ellipse</h2><p>Center, major axis, minor axis, and horizontal or vertical orientation.</p></div><canvas class="miniCanvas" id="miniEllipse" width="210" height="160"></canvas></div>
+        <div class="menuCard" onclick="openTopic('hyperbola')"><div><h2>Hyperbola</h2><p>Two branches, center, transverse axis, and asymptotes.</p></div><canvas class="miniCanvas" id="miniHyperbola" width="210" height="160"></canvas></div>
+      </div>
+      <div class="brand">© 2026 Delta Matemática | Created by Luis Ramos Jr. All Rights Reserved.</div>
+    </section>
+
+    <section id="topic" class="screen">
+      <div class="topbar"><div class="titleSmall" id="topicTitle">Topic</div><div class="navBtns"><button class="btn secondary small" onclick="showScreen('menu')">MAIN MENU</button><button class="btn small" onclick="startPractice(currentTopic)">PRACTICE</button></div></div>
+      <div class="topicLayout">
+        <div class="sidePanel" id="lessonButtons"></div>
+        <div class="contentPanel">
+          <div class="lessonText" id="lessonText"></div>
+          <div class="graphPanel"><canvas id="topicCanvas" width="560" height="440"></canvas><div class="graphLabel" id="graphLabel"></div></div>
+        </div>
+      </div>
+      <div class="brand">© 2026 Delta Matemática | Created by Luis Ramos Jr. All Rights Reserved.</div>
+    </section>
+
+    <section id="practice" class="screen">
+      <div class="topbar"><div class="titleSmall" id="practiceTitle">Practice</div><div class="navBtns"><button class="btn secondary small" onclick="openTopic(currentTopic)">BACK TO LESSON</button><button class="btn secondary small" onclick="showScreen('menu')">MAIN MENU</button></div></div>
+      <div class="practiceArea">
+        <div class="practiceLayout">
+          <div class="questionBox"><div class="qMeta" id="qMeta">Question</div><div class="qText" id="qText"></div><div class="feedback" id="feedback"></div><div class="practiceBtns"><button class="btn small" id="nextBtn" onclick="nextQuestion()" style="display:none">NEXT</button></div></div>
+          <div class="choicesBox" id="choicesBox"></div>
+        </div>
+        <div class="questionNav" id="questionNav"></div>
+      </div>
+      <div class="brand">© 2026 Delta Matemática | Created by Luis Ramos Jr. All Rights Reserved.</div>
+    </section>
+
+    <section id="result" class="screen">
+      <div class="topbar"><div class="titleSmall">Practice Result</div><div class="navBtns"><button class="btn secondary small" onclick="showScreen('menu')">MAIN MENU</button></div></div>
+      <div class="resultCard"><div class="scoreBox"><h1 id="scoreTitle">Great work!</h1><p id="scoreText"></p><div class="heroBtns" style="justify-content:center"><button class="btn" onclick="startPractice(currentTopic)">TRY AGAIN</button><button class="btn secondary" onclick="openTopic(currentTopic)">BACK TO LESSON</button></div></div></div>
+      <div class="brand">© 2026 Delta Matemática | Created by Luis Ramos Jr. All Rights Reserved.</div>
+    </section>
+  </div>
+
+<script>
+const topics = {
+  circle:{
+    name:'Circle', color:'#4cc9f0',
+    lessons:[
+      {tab:'Main Idea', label:'A circle is the set of all points the same distance from one fixed point.', html:`<h1>Circle</h1><p>A <b>circle</b> is the set of all points that are the same distance from a fixed point called the <b>center</b>.</p><h3>Important parts</h3><ul><li><b>Center:</b> \\((h,k)\\)</li><li><b>Radius:</b> distance from the center to the circle</li><li><b>Diameter:</b> twice the radius</li></ul>`, graph:'circleParts'},
+      {tab:'Equation', label:'Standard and general forms of a circle', html:`<h1>Circle Equation</h1><p>A circle equation can be written in two common forms.</p><h3>1. Standard Form</h3><div class="formulaBox">\\[(x-h)^2+(y-k)^2=r^2\\]</div><p>The center is \\((h,k)\\) and the radius is \\(r\\).</p><h3>2. General Form</h3><div class="formulaBox">\\[x^2+y^2+Dx+Ey+F=0\\]</div><p>This form is expanded. To find the center and radius, we usually complete the square.</p><h3>Example</h3><p>Standard form:</p><div class="formulaBox">\\[(x-2)^2+(y+1)^2=9\\]</div><p>Center: \\((2,-1)\\), Radius: \\(3\\).</p><p>General form of the same circle:</p><div class="formulaBox">\\[x^2+y^2-4x+2y-4=0\\]</div>`, graph:'circleEquation'},
+      {tab:'Graph', label:'Graphing a circle', html:`<h1>Graphing a Circle</h1><p>To graph a circle:</p><ul><li>Plot the center.</li><li>Move radius units left, right, up, and down.</li><li>Sketch a smooth round curve through the points.</li></ul><div class="formulaBox">Center \\((1,1)\\), Radius \\(3\\)</div>`, graph:'circleGraph'}
+    ]
+  },
+  parabola:{
+    name:'Parabola', color:'#80ed99',
+    lessons:[
+      {tab:'Main Idea', label:'A parabola is a U-shaped curve.', html:`<h1>Parabola</h1><p>A <b>parabola</b> is a U-shaped conic section.</p><h3>Important parts</h3><ul><li><b>Vertex:</b> turning point</li><li><b>Axis of symmetry:</b> line that divides it into two equal halves</li><li><b>Opening:</b> up, down, left, or right</li></ul>`, graph:'parabolaParts'},
+      {tab:'Equation', label:'Vertex form for vertical parabolas', html:`<h1>Parabola Equation</h1><p>A common form is:</p><div class="formulaBox">\\[y=a(x-h)^2+k\\]</div><p>The vertex is \\((h,k)\\). If \\(a>0\\), it opens up. If \\(a<0\\), it opens down.</p><h3>Example</h3><p>\\[y=2(x-1)^2-3\\]</p><p>Vertex: \\((1,-3)\\), opens up.</p>`, graph:'parabolaEquation'},
+      {tab:'Graph', label:'Changing a in a parabola', html:`<h1>Shape of a Parabola</h1><p>The value of \\(a\\) changes the graph.</p><ul><li>Large \\(|a|\\): narrower parabola</li><li>Small \\(|a|\\): wider parabola</li><li>Negative \\(a\\): opens downward</li></ul>`, graph:'parabolaGraph'}
+    ]
+  },
+  ellipse:{
+    name:'Ellipse', color:'#ff70a6',
+    lessons:[
+      {tab:'Main Idea', label:'An ellipse looks like a stretched circle.', html:`<h1>Ellipse</h1><p>An <b>ellipse</b> looks like a stretched circle.</p><h3>Important parts</h3><ul><li><b>Center:</b> middle point</li><li><b>Major axis:</b> longer direction</li><li><b>Minor axis:</b> shorter direction</li></ul>`, graph:'ellipseParts'},
+      {tab:'Equation', label:'Standard equation of an ellipse', html:`<h1>Ellipse Equation</h1><p>The standard equation is:</p><div class="formulaBox">\\[\\frac{(x-h)^2}{a^2}+\\frac{(y-k)^2}{b^2}=1\\]</div><p>The center is \\((h,k)\\). The larger denominator tells the direction of the major axis.</p>`, graph:'ellipseEquation'},
+      {tab:'Graph', label:'Horizontal and vertical ellipses', html:`<h1>Orientation</h1><p>If the larger denominator is under \\((x-h)^2\\), the ellipse is horizontal.</p><p>If the larger denominator is under \\((y-k)^2\\), the ellipse is vertical.</p><div class="formulaBox">\\[\\frac{x^2}{16}+\\frac{y^2}{4}=1\\]</div><p>This ellipse is horizontal.</p>`, graph:'ellipseGraph'}
+    ]
+  },
+  hyperbola:{
+    name:'Hyperbola', color:'#bdb2ff',
+    lessons:[
+      {tab:'Main Idea', label:'A hyperbola has two separate branches.', html:`<h1>Hyperbola</h1><p>A <b>hyperbola</b> has two separate curved branches.</p><h3>Important parts</h3><ul><li><b>Center:</b> middle point</li><li><b>Branches:</b> two separate curves</li><li><b>Asymptotes:</b> guide lines the branches approach</li></ul>`, graph:'hyperbolaParts'},
+      {tab:'Equation', label:'Horizontal and vertical hyperbola forms', html:`<h1>Hyperbola Equation</h1><p>Horizontal hyperbola:</p><div class="formulaBox">\\[\\frac{(x-h)^2}{a^2}-\\frac{(y-k)^2}{b^2}=1\\]</div><p>Vertical hyperbola:</p><div class="formulaBox">\\[\\frac{(y-k)^2}{a^2}-\\frac{(x-h)^2}{b^2}=1\\]</div>`, graph:'hyperbolaEquation'},
+      {tab:'Graph', label:'Asymptotes guide the branches', html:`<h1>Asymptotes</h1><p>The branches of a hyperbola get closer and closer to the asymptotes but do not cross them in the basic graph.</p><p>Use the sign order to decide the direction:</p><ul><li>\\(x^2-y^2\\): left and right</li><li>\\(y^2-x^2\\): up and down</li></ul>`, graph:'hyperbolaGraph'}
+    ]
+  }
+};
+
+function ri(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function nonZero(min,max){ let n=0; while(n===0){ n=ri(min,max); } return n; }
+function pick(arr){ return arr[ri(0,arr.length-1)]; }
+function sq(n){ return n*n; }
+function coord(x,y){ return `\\((${x},${y})\\)`; }
+function bin(variable,value){ return `(${variable}${value>=0?'-'+value:'+'+(-value)})`; }
+function circleEq(h,k,r2){ return `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r2}\\)`; }
+function originCircleEq(r2){ return `\\(x^2+y^2=${r2}\\)`; }
+function term(coeff,variable){ if(coeff===0) return ''; const sign=coeff>0?'+':'-'; const abs=Math.abs(coeff); return `${sign}${abs===1?'':abs}${variable}`; }
+function generalCircleEq(h,k,r2){ const F=sq(h)+sq(k)-r2; const fTerm = F===0 ? '' : (F>0?`+${F}`:`${F}`); return `\\(x^2+y^2${term(-2*h,'x')}${term(-2*k,'y')}${fTerm}=0\\)`; }
+function standardFormText(){ return `\\((x-h)^2+(y-k)^2=r^2\\)`; }
+function generalFormText(){ return `\\(x^2+y^2+Dx+Ey+F=0\\)`; }
+function generateCirclePracticeSet(){
+  const set=[];
+  const triples=[[3,4,5],[5,12,13],[8,15,17],[7,24,25]];
+
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(2,8), r2=sq(r);
+    set.push({q:`1. Identify the center from standard form. What is the center of ${circleEq(h,k,r2)}?`, c:[coord(h,k), coord(-h,-k), coord(h,-k), coord(-h,k)], a:0, why:`In ${standardFormText()}, the center is ${coord(h,k)}.`});
+  }
+  {
+    const h=nonZero(-5,5), k=nonZero(-5,5), r=ri(2,9), r2=sq(r);
+    set.push({q:`2. Identify the radius from standard form. What is the radius of ${circleEq(h,k,r2)}?`, c:[`\\(${r}\\)`,`\\(${r2}\\)`,`\\(${2*r}\\)`,`\\(\\sqrt{${r}}\\)`], a:0, why:`The right side is \\(r^2\\). Since \\(r^2=${r2}\\), the radius is \\(${r}\\).`});
+  }
+  {
+    const h=nonZero(-5,5), k=nonZero(-5,5), r=ri(2,8), r2=sq(r);
+    set.push({q:`3. Identify both center and radius. For ${circleEq(h,k,r2)}, what are the center and radius?`, c:[`Center ${coord(h,k)}, radius \\(${r}\\)`,`Center ${coord(-h,-k)}, radius \\(${r}\\)`,`Center ${coord(h,k)}, radius \\(${r2}\\)`,`Center ${coord(h,-k)}, radius \\(${r}\\)`], a:0, why:`The center is ${coord(h,k)}, and \\(r=\\sqrt{${r2}}=${r}\\).`});
+  }
+  {
+    const r=ri(2,15), d=2*r;
+    set.push({q:`4. Find the diameter from the radius. If a circle has radius \\(${r}\\), what is its diameter?`, c:[`\\(${d}\\)`,`\\(${r}\\)`,`\\(${d+2}\\)`,`\\(${sq(r)}\\)`], a:0, why:`The diameter is twice the radius: \\(d=2r=${d}\\).`});
+  }
+  {
+    const r=ri(2,15), d=2*r;
+    set.push({q:`5. Find the radius from the diameter. If a circle has diameter \\(${d}\\), what is its radius?`, c:[`\\(${r}\\)`,`\\(${d}\\)`,`\\(${r+2}\\)`,`\\(${Math.max(1, r-2)}\\)`], a:0, why:`The radius is half the diameter: \\(r=\\frac{${d}}{2}=${r}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(2,8), r2=sq(r);
+    set.push({q:`6. Write the equation from center and radius. A circle has center ${coord(h,k)} and radius \\(${r}\\). Which is its equation?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`Use ${standardFormText()} with center ${coord(h,k)} and \\(r^2=${r2}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), d=2*ri(2,8), r=d/2, r2=sq(r);
+    set.push({q:`7. Write the equation from center and diameter. A circle has center ${coord(h,k)} and diameter \\(${d}\\). Which is its equation?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${d}\\)`, `\\(${bin('x',h)}^2+${bin('y',k)}^2=${sq(d)}\\)`], a:0, why:`The radius is \\(r=\\frac{${d}}{2}=${r}\\), so \\(r^2=${r2}\\).`});
+  }
+  {
+    const r=ri(2,10), r2=sq(r);
+    set.push({q:`8. Write the equation when the center is the origin. A circle has center ${coord(0,0)} and radius \\(${r}\\). Which is its equation?`, c:[originCircleEq(r2), `\\(x^2+y^2=${r}\\)`, `\\((x-${r})^2+y^2=${r2}\\)`, `\\(x^2+(y-${r})^2=${r2}\\)`], a:0, why:`When the center is ${coord(0,0)}, the equation is \\(x^2+y^2=r^2\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(2,8), r2=sq(r);
+    set.push({q:`9. Choose the correct equation from a given center and radius. Which equation has center ${coord(h,k)} and radius \\(${r}\\)?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`Use the center ${coord(h,k)} and \\(r^2=${r2}\\).`});
+  }
+  {
+    set.push({q:`10. Identify standard form. What is the name of ${standardFormText()}?`, c:['Standard form of a circle','General form of a circle','Vertex form of a parabola','Slope-intercept form'], a:0, why:`${standardFormText()} is the standard form of a circle.`});
+  }
+  {
+    set.push({q:`11. Identify general form. What is the name of ${generalFormText()}?`, c:['General form of a circle','Standard form of a circle','Point-slope form','Vertex form'], a:0, why:`${generalFormText()} is the general form of a circle.`});
+  }
+  {
+    const h=nonZero(-4,4), k=nonZero(-4,4), r=ri(3,9), r2=sq(r);
+    const correct=generalCircleEq(h,k,r2);
+    const wrong1=generalCircleEq(-h,k,r2);
+    const wrong2=generalCircleEq(h,-k,r2);
+    const F=sq(h)+sq(k)-r2;
+    const wrong3=`\\(x^2+y^2${term(-2*h,'x')}${term(-2*k,'y')}${(F+2)>=0?`+${F+2}`:`${F+2}`}=0\\)`;
+    set.push({q:`12. Convert standard form to general form. Which is the general form of ${circleEq(h,k,r2)}?`, c:[correct, wrong1, wrong2, wrong3], a:0, why:`Expanding and simplifying gives ${correct}.`});
+  }
+  {
+    const h=nonZero(-4,4), k=nonZero(-4,4), r=ri(3,9), r2=sq(r);
+    const general=generalCircleEq(h,k,r2);
+    set.push({q:`13. Convert general form to standard form. Which is the standard form of ${general}?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, circleEq(h,-k,r2)], a:0, why:`Completing the square gives ${circleEq(h,k,r2)}.`});
+  }
+  {
+    const h=nonZero(-5,5), k=nonZero(-5,5), r=ri(3,9), r2=sq(r);
+    const general=generalCircleEq(h,k,r2);
+    set.push({q:`14. Find center and radius from general form. For ${general}, what are the center and radius?`, c:[`Center ${coord(h,k)}, radius \\(${r}\\)`,`Center ${coord(-h,-k)}, radius \\(${r}\\)`,`Center ${coord(h,k)}, radius \\(${r2}\\)`,`Center ${coord(k,h)}, radius \\(${r}\\)`], a:0, why:`After completing the square, the equation becomes ${circleEq(h,k,r2)}. So the center is ${coord(h,k)} and the radius is \\(${r}\\).`});
+  }
+  {
+    const h=nonZero(-5,5), k=nonZero(-5,5), r=ri(2,8), r2=sq(r);
+    set.push({q:`15. Match a graph to an equation. A graph shows center ${coord(h,k)} and radius \\(${r}\\). Which equation matches the graph?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`A graph with center ${coord(h,k)} and radius \\(${r}\\) matches ${circleEq(h,k,r2)}.`});
+  }
+  {
+    const h=nonZero(-5,5), k=nonZero(-5,5), r=ri(2,8), r2=sq(r);
+    set.push({q:`16. Match an equation to a graph. Which graph would match ${circleEq(h,k,r2)}?`, c:[`Center ${coord(h,k)}, radius \\(${r}\\)`,`Center ${coord(-h,-k)}, radius \\(${r}\\)`,`Center ${coord(h,k)}, radius \\(${r2}\\)`,`Center ${coord(k,h)}, radius \\(${r}\\)`], a:0, why:`From ${circleEq(h,k,r2)}, the center is ${coord(h,k)} and the radius is \\(${r}\\).`});
+  }
+  {
+    const x=nonZero(-6,6), y=nonZero(-6,6);
+    const xText = x>0 ? `\\(${x}\\) units right` : `\\(${Math.abs(x)}\\) units left`;
+    const yText = y>0 ? `\\(${y}\\) units up` : `\\(${Math.abs(y)}\\) units down`;
+    set.push({q:`17. Identify the center from a graph. A circle is centered ${xText} from the origin and ${yText}. What is the center?`, c:[coord(x,y), coord(-x,-y), coord(x,-y), coord(y,x)], a:0, why:`Moving ${xText} and ${yText} gives the center ${coord(x,y)}.`});
+  }
+  {
+    const h=ri(-4,4), k=ri(-4,4), r=ri(2,10);
+    const vertical=Math.random()<0.5;
+    const point = vertical ? coord(h,k+r) : coord(h+r,k);
+    set.push({q:`18. Identify the radius from a graph. The center is ${coord(h,k)}, and the circle passes through ${point}. What is the radius?`, c:[`\\(${r}\\)`,`\\(${r+1}\\)`,`\\(${sq(r)}\\)`,`\\(${Math.max(1,r-1)}\\)`], a:0, why:`The distance from the center ${coord(h,k)} to ${point} is \\(${r}\\), so the radius is \\(${r}\\).`});
+  }
+  {
+    const [a,b,c]=pick(triples);
+    const eq=originCircleEq(sq(c));
+    set.push({q:`19. Identify if a point lies on the circle. Is ${coord(a,b)} on the circle ${eq}?`, c:['Yes, it is on the circle.','No, it is inside the circle.','No, it is outside the circle.','There is not enough information.'], a:0, why:`Substituting gives \\(${a}^2+${b}^2=${sq(a)}+${sq(b)}=${sq(c)}\\), so the point lies on the circle.`});
+  }
+  {
+    const [a,b,c]=pick(triples);
+    set.push({q:`20. Find a missing coordinate. For ${originCircleEq(sq(c))}, if \\(x=${a}\\), what are the possible values of \\(y\\)?`, c:[`\\(y=\\pm${b}\\)`,`\\(y=${b}\\) only`,`\\(y=\\pm${c}\\)`,`\\(y=\\pm${a}\\)`], a:0, why:`Substitute \\(x=${a}\\): \\(${a}^2+y^2=${sq(c)}\\), so \\(y^2=${sq(b)}\\) and \\(y=\\pm${b}\\).`});
+  }
+  {
+    const r=ri(2,12), r2=sq(r);
+    set.push({q:`21. Decide if an equation represents a circle. Which equation represents a circle?`, c:[originCircleEq(r2), `\\(y=x^2+${ri(1,6)}\\)`, `\\(y=${ri(2,6)}x+${ri(-5,5)}\\)`, `\\(x^2-y^2=${r2}\\)`], a:0, why:`A circle has both \\(x^2\\) and \\(y^2\\) with the same coefficient and a plus sign between them.`});
+  }
+  {
+    const h=nonZero(-4,4), k=nonZero(-4,4), r=ri(2,8), r2=sq(r);
+    const a=ri(2,9), b=ri(2,9);
+    set.push({q:`22. Choose which equation is a circle. Which equation represents a circle?`, c:[circleEq(h,k,r2), `\\(y=${ri(2,5)}${bin('x',h)}^2${k>=0?'+':''}${k}\\)`, `\\(\\frac{x^2}{${a}}+\\frac{y^2}{${b}}=1\\)`, `\\(\\frac{x^2}{${a}}-\\frac{y^2}{${b}}=1\\)`], a:0, why:`Only ${circleEq(h,k,r2)} is written in the standard form of a circle.`});
+  }
+  {
+    set.push({q:`23. Compare conic equations. Which statement best describes a circle equation?`, c:['Both \\(x\\) and \\(y\\) are squared and have equal coefficients.','Only one variable is squared.','The squared terms are subtracted.','The denominators under \\(x^2\\) and \\(y^2\\) must be different.'], a:0, why:`For a circle, the coefficients of \\(x^2\\) and \\(y^2\\) are equal.`});
+  }
+  {
+    const h=ri(-4,4), k=ri(-4,4), r=ri(2,8), r2=sq(r);
+    const horizontal=Math.random()<0.5;
+    const p1 = horizontal ? coord(h-r,k) : coord(h,k-r);
+    const p2 = horizontal ? coord(h+r,k) : coord(h,k+r);
+    set.push({q:`24. Find equation from endpoints of a diameter. A diameter has endpoints ${p1} and ${p2}. What is the equation of the circle?`, c:[circleEq(h,k,r2), circleEq(horizontal?h-r:h, horizontal?k:k-r, r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${2*r}\\)`, circleEq(-h,-k,r2)], a:0, why:`The midpoint of the diameter is ${coord(h,k)}, and the radius is \\(${r}\\).`});
+  }
+  {
+    const h=ri(-4,4), k=ri(-4,4);
+    const [dx,dy,r]=pick(triples);
+    const sx=Math.random()<0.5?1:-1, sy=Math.random()<0.5?1:-1;
+    const px=h+sx*dx, py=k+sy*dy, r2=sq(r);
+    set.push({q:`25. Find equation from center and a point. A circle has center ${coord(h,k)} and passes through ${coord(px,py)}. What is its equation?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, circleEq(px,py,r2)], a:0, why:`The distance from ${coord(h,k)} to ${coord(px,py)} is \\(${r}\\), so \\(r^2=${r2}\\).`});
+  }
+  {
+    const r=ri(2,12), area=`\\(${sq(r)}\\pi\\)`;
+    set.push({q:`26. Find area from radius. If a circle has radius \\(${r}\\), what is its area?`, c:[`\\(${sq(r)}\\pi\\)`,`\\(${2*r}\\pi\\)`,`\\(${r}\\pi\\)`,`\\(${4*sq(r)}\\pi\\)`], a:0, why:`Use \\(A=\\pi r^2\\). Since \\(r=${r}\\), \\(A=${sq(r)}\\pi\\).`});
+  }
+  {
+    const r=ri(2,12);
+    set.push({q:`27. Find circumference from radius. If a circle has radius \\(${r}\\), what is its circumference?`, c:[`\\(${2*r}\\pi\\)`,`\\(${sq(r)}\\pi\\)`,`\\(${r}\\pi\\)`,`\\(${4*r}\\pi\\)`], a:0, why:`Use \\(C=2\\pi r\\). Since \\(r=${r}\\), \\(C=${2*r}\\pi\\).`});
+  }
+  {
+    const r=ri(2,12), area=`\\(${sq(r)}\\pi\\)`;
+    set.push({q:`28. Find radius from area. If the area of a circle is ${area}, what is the radius?`, c:[`\\(${r}\\)`,`\\(${sq(r)}\\)`,`\\(${2*r}\\)`,`\\(\\sqrt{${sq(r)}\\pi}\\)`], a:0, why:`Since \\(A=\\pi r^2=${sq(r)}\\pi\\), then \\(r^2=${sq(r)}\\) and \\(r=${r}\\).`});
+  }
+  {
+    const r=ri(2,12), circ=`\\(${2*r}\\pi\\)`;
+    set.push({q:`29. Find radius from circumference. If the circumference is ${circ}, what is the radius?`, c:[`\\(${r}\\)`,`\\(${2*r}\\)`,`\\(${Math.max(1, r-1)}\\)`,`\\(${4*r}\\)`], a:0, why:`Use \\(C=2\\pi r\\). Since \\(${2*r}\\pi=2\\pi r\\), the radius is \\(${r}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(2,8), r2=sq(r);
+    set.push({q:`30. A circular fountain has center ${coord(h,k)} and radius \\(${r}\\). Which equation represents its boundary?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`Use the center ${coord(h,k)} and \\(r^2=${r2}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(3,10), r2=sq(r);
+    set.push({q:`31. A Wi-Fi router is located at ${coord(h,k)}, and its signal reaches \\(${r}\\) meters. What is the equation of the coverage boundary?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`The router is at the center ${coord(h,k)}, and \\(r^2=${r2}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(2,8), r2=sq(r);
+    set.push({q:`32. A sprinkler is placed at ${coord(h,k)} and waters a circular area with radius \\(${r}\\) meters. Which equation represents the edge of the watered area?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`The sprinkler is the center ${coord(h,k)}, and \\(r^2=${r2}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), d=2*ri(2,8), r=d/2, r2=sq(r);
+    set.push({q:`33. A circular garden has center ${coord(h,k)} and diameter \\(${d}\\) meters. What is its equation?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${d}\\)`, `\\(${bin('x',h)}^2+${bin('y',k)}^2=${sq(d)}\\)`], a:0, why:`Half of the diameter gives the radius: \\(r=\\frac{${d}}{2}=${r}\\), so \\(r^2=${r2}\\).`});
+  }
+  {
+    const h=nonZero(-6,6), k=nonZero(-6,6), r=ri(2,8), r2=sq(r);
+    set.push({q:`34. A circular pond has center ${coord(h,k)} and area \\(${r2}\\pi\\) square meters. What is its equation?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, `\\(${bin('x',k)}^2+${bin('y',h)}^2=${r2}\\)`], a:0, why:`Since \\(A=\\pi r^2=${r2}\\pi\\), we have \\(r^2=${r2}\\).`});
+  }
+  {
+    const h=ri(-4,4), k=ri(-4,4);
+    const [dx,dy,r]=pick(triples);
+    const sx=Math.random()<0.5?1:-1, sy=Math.random()<0.5?1:-1;
+    const px=h+sx*dx, py=k+sy*dy, r2=sq(r);
+    set.push({q:`35. A circular park has center ${coord(h,k)} and passes through ${coord(px,py)}. What is its equation?`, c:[circleEq(h,k,r2), circleEq(-h,-k,r2), `\\(${bin('x',h)}^2+${bin('y',k)}^2=${r}\\)`, circleEq(px,py,r2)], a:0, why:`The distance from the center ${coord(h,k)} to ${coord(px,py)} is \\(${r}\\), so \\(r^2=${r2}\\).`});
+  }
+
+  return set;
+}
+
+const practiceData={
+ circle: generateCirclePracticeSet(),
+ parabola:[
+  {q:'What is the vertex of \\(y=(x-4)^2+1\\)?', c:['\\((4,1)\\)','\\((-4,1)\\)','\\((4,-1)\\)','\\((-4,-1)\\)'], a:0, why:'In \\(y=a(x-h)^2+k\\), the vertex is \\((h,k)\\).'},
+  {q:'Does \\(y=-3(x+2)^2+5\\) open up or down?', c:['Down','Up','Left','Right'], a:0, why:'Because \\(a=-3\\), the parabola opens down.'},
+  {q:'Which equation has vertex \\((0,0)\\)?', c:['\\(y=2x^2\\)','\\(y=2(x-1)^2\\)','\\(y=(x+2)^2-3\\)','\\(y=-2(x-4)^2+1\\)'], a:0, why:'\\(y=2x^2\\) has vertex at the origin.'},
+  {q:'What is the axis of symmetry of \\(y=(x-3)^2-2\\)?', c:['\\(x=3\\)','\\(y=3\\)','\\(x=-2\\)','\\(y=-2\\)'], a:0, why:'For \\(y=a(x-h)^2+k\\), the axis of symmetry is \\(x=h\\).'},
+  {q:'Which value of \\(a\\) makes the parabola open downward?', c:['\\(-2\\)','\\(2\\)','\\(\\frac{1}{2}\\)','\\(5\\)'], a:0, why:'A negative value of \\(a\\) opens the parabola downward.'},
+  {q:'What is the vertex of \\(y=2(x+1)^2-6\\)?', c:['\\((-1,-6)\\)','\\((1,-6)\\)','\\((-1,6)\\)','\\((1,6)\\)'], a:0, why:'Since \\(x+1=x-(-1)\\), the vertex is \\((-1,-6)\\).'},
+  {q:'Which equation opens upward?', c:['\\(y=4(x-2)^2+1\\)','\\(y=-4(x-2)^2+1\\)','\\(x=-4(y-2)^2+1\\)','\\(y=-(x+1)^2\\)'], a:0, why:'The coefficient of the squared term is positive.'},
+  {q:'The point where a parabola turns is called the:', c:['vertex','center','radius','asymptote'], a:0, why:'The turning point is the vertex.'}
+ ],
+ ellipse:[
+  {q:'What is the center of \\(\\frac{(x-2)^2}{16}+\\frac{(y+1)^2}{9}=1\\)?', c:['\\((2,-1)\\)','\\((-2,1)\\)','\\((2,1)\\)','\\((-2,-1)\\)'], a:0, why:'The center is \\((h,k)=(2,-1)\\).'},
+  {q:'For \\(\\frac{x^2}{25}+\\frac{y^2}{9}=1\\), is the ellipse horizontal or vertical?', c:['Horizontal','Vertical','Neither','Circle'], a:0, why:'The larger denominator 25 is under \\(x^2\\), so it is horizontal.'},
+  {q:'Which conic looks like a stretched circle?', c:['Ellipse','Parabola','Hyperbola','Line'], a:0, why:'An ellipse is like a stretched circle.'},
+  {q:'In \\(\\frac{x^2}{4}+\\frac{y^2}{36}=1\\), which axis is longer?', c:['Vertical','Horizontal','Both equal','No axis'], a:0, why:'The larger denominator is under \\(y^2\\), so the vertical axis is longer.'},
+  {q:'What is the center of \\(\\frac{(x+3)^2}{9}+\\frac{(y-5)^2}{16}=1\\)?', c:['\\((-3,5)\\)','\\((3,-5)\\)','\\((-3,-5)\\)','\\((3,5)\\)'], a:0, why:'The signs inside the parentheses are opposite.'},
+  {q:'Which equation represents an ellipse?', c:['\\(\\frac{x^2}{9}+\\frac{y^2}{4}=1\\)','\\(x^2+y^2=9\\)','\\(y=(x-2)^2\\)','\\(\\frac{x^2}{9}-\\frac{y^2}{4}=1\\)'], a:0, why:'An ellipse has a plus sign between the two squared terms and denominators.'},
+  {q:'The longer axis of an ellipse is called the:', c:['major axis','minor axis','radius','asymptote'], a:0, why:'The longer axis is the major axis.'},
+  {q:'The shorter axis of an ellipse is called the:', c:['minor axis','major axis','diameter','directrix'], a:0, why:'The shorter axis is the minor axis.'}
+ ],
+ hyperbola:[
+  {q:'Which conic has two separate branches?', c:['Hyperbola','Circle','Ellipse','Parabola'], a:0, why:'A hyperbola has two separate branches.'},
+  {q:'Which equation represents a horizontal hyperbola centered at the origin?', c:['\\(\\frac{x^2}{9}-\\frac{y^2}{4}=1\\)','\\(\\frac{y^2}{9}-\\frac{x^2}{4}=1\\)','\\(x^2+y^2=9\\)','\\(y=x^2\\)'], a:0, why:'When the positive term is \\(x^2\\), the hyperbola opens left and right.'},
+  {q:'Which equation represents a vertical hyperbola centered at the origin?', c:['\\(\\frac{y^2}{16}-\\frac{x^2}{9}=1\\)','\\(\\frac{x^2}{16}-\\frac{y^2}{9}=1\\)','\\(\\frac{x^2}{16}+\\frac{y^2}{9}=1\\)','\\(x^2+y^2=16\\)'], a:0, why:'When the positive term is \\(y^2\\), it opens up and down.'},
+  {q:'The guide lines of a hyperbola are called:', c:['asymptotes','radii','diameters','vertices only'], a:0, why:'Hyperbola branches approach asymptotes.'},
+  {q:'What is the center of \\(\\frac{(x-1)^2}{4}-\\frac{(y+2)^2}{9}=1\\)?', c:['\\((1,-2)\\)','\\((-1,2)\\)','\\((1,2)\\)','\\((-1,-2)\\)'], a:0, why:'The center is \\((h,k)=(1,-2)\\).'},
+  {q:'For \\(\\frac{x^2}{4}-\\frac{y^2}{25}=1\\), the branches open:', c:['left and right','up and down','in a circle','only upward'], a:0, why:'The positive term is \\(x^2\\), so the branches open left and right.'},
+  {q:'Which sign appears between the two squared fractions in a hyperbola equation?', c:['minus sign','plus sign','equal sign','multiplication sign'], a:0, why:'A basic hyperbola equation uses a difference of squared terms.'},
+  {q:'Which is NOT a conic section?', c:['Cube','Circle','Ellipse','Parabola'], a:0, why:'A cube is a 3D solid, not a conic section.'}
+ ]
+};
+let currentTopic='circle', currentLesson=0, qIndex=0, score=0, answered=false, answerState=[];
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); setTimeout(drawAll,40); }
+function openTopic(key){ currentTopic=key; currentLesson=0; showScreen('topic'); renderTopic(); }
+function renderTopic(){ const t=topics[currentTopic]; document.getElementById('topicTitle').textContent=t.name; const btns=document.getElementById('lessonButtons'); btns.innerHTML=''; t.lessons.forEach((l,i)=>{ const b=document.createElement('button'); b.className='topicBtn'+(i===currentLesson?' active':''); b.innerHTML=`${i+1}. ${l.tab}<br><span style="font-weight:500;color:${i===currentLesson?'#07142f':'#c7d7ff'};font-size:13px">${l.label}</span>`; b.onclick=()=>{currentLesson=i;renderTopic()}; btns.appendChild(b); }); const l=t.lessons[currentLesson]; document.getElementById('lessonText').innerHTML=l.html; document.getElementById('graphLabel').innerHTML=l.label; if(window.MathJax){MathJax.typesetPromise([document.getElementById('lessonText'), document.getElementById('graphLabel')]);} setTimeout(()=>drawTopicGraph(l.graph),30); }
+function startPractice(key){ if(key==='circle'){ practiceData.circle=generateCirclePracticeSet(); } currentTopic=key; qIndex=0; score=0; answered=false; answerState=Array(practiceData[key].length).fill(null); showScreen('practice'); document.getElementById('practiceTitle').textContent=topics[key].name+' Practice'; renderQuestion(); }
+function shuffleArray(arr){
+  const copy=[...arr];
+  for(let i=copy.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]]=[copy[j],copy[i]];
+  }
+  return copy;
+}
+
+function renderQuestion(){
+  const data=practiceData[currentTopic];
+  const q=data[qIndex];
+  const state=answerState[qIndex];
+
+  answered=!!state;
+  document.getElementById('nextBtn').style.display=answered?'inline-block':'none';
+  document.getElementById('feedback').textContent='';
+  document.getElementById('feedback').className='feedback';
+
+  if(!q.shuffledChoices){
+    const shuffled=shuffleArray(q.c.map((choice,i)=>({choice,correct:i===q.a})));
+    q.shuffledChoices=shuffled;
+    q.shuffledAnswer=shuffled.findIndex(item=>item.correct);
+  }
+
+  document.getElementById('qMeta').textContent=`Question ${qIndex+1} of ${data.length}`;
+  document.getElementById('qText').innerHTML=q.q;
+
+  const box=document.getElementById('choicesBox');
+  box.innerHTML='';
+  q.shuffledChoices.forEach((item,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice';
+    btn.innerHTML=item.choice;
+    btn.onclick=()=>chooseAnswer(btn,i);
+    if(state){
+      if(i===q.shuffledAnswer) btn.classList.add('correct');
+      if(i===state.selected && !state.correct) btn.classList.add('wrong');
+    }
+    box.appendChild(btn);
+  });
+
+  if(state){
+    const fb=document.getElementById('feedback');
+    fb.className='feedback '+(state.correct?'ok':'no');
+    fb.innerHTML=(state.correct?'<span>Correct!</span> ':'<span>Not quite.</span> ')+q.why;
+  }
+
+  renderQuestionNav();
+
+  if(window.MathJax){
+    MathJax.typesetPromise([document.getElementById('qText'), document.getElementById('choicesBox'), document.getElementById('feedback')]);
+  }
+}
+function chooseAnswer(btn,i){
+  if(answered) return;
+  answered=true;
+  const q=practiceData[currentTopic][qIndex];
+  const fb=document.getElementById('feedback');
+  const choices=[...document.querySelectorAll('.choice')];
+  const correct=i===q.shuffledAnswer;
+
+  choices[q.shuffledAnswer].classList.add('correct');
+  answerState[qIndex]={selected:i, correct:correct};
+  score=answerState.filter(s=>s&&s.correct).length;
+
+  if(correct){
+    fb.className='feedback ok';
+    fb.innerHTML='<span>Correct!</span> '+q.why;
+  } else {
+    btn.classList.add('wrong');
+    fb.className='feedback no';
+    fb.innerHTML='<span>Not quite.</span> '+q.why;
+  }
+
+  document.getElementById('nextBtn').style.display='inline-block';
+  renderQuestionNav();
+
+  if(window.MathJax){
+    MathJax.typesetClear && MathJax.typesetClear([fb]);
+    MathJax.typesetPromise([fb, document.getElementById('qText'), document.getElementById('choicesBox')]);
+  }
+}
+function nextQuestion(){ const data=practiceData[currentTopic]; if(qIndex<data.length-1){qIndex++;renderQuestion()}else{showResult()} }
+function jumpToQuestion(index){ qIndex=index; renderQuestion(); }
+function renderQuestionNav(){
+  const nav=document.getElementById('questionNav');
+  if(!nav) return;
+  const data=practiceData[currentTopic];
+  nav.innerHTML='';
+  data.forEach((q,i)=>{
+    const b=document.createElement('button');
+    b.className='qNavBtn'+(i===qIndex?' active':'')+(answerState[i]?(answerState[i].correct?' done':' missed'):'');
+    b.textContent=i+1;
+    b.onclick=()=>jumpToQuestion(i);
+    nav.appendChild(b);
+  });
+}
+function showResult(){ showScreen('result'); const total=practiceData[currentTopic].length; const pct=Math.round(score/total*100); document.getElementById('scoreTitle').textContent=pct>=85?'Excellent!':pct>=70?'Good work!':'Keep practicing!'; document.getElementById('scoreText').innerHTML=`You scored <b>${score} out of ${total}</b> in ${topics[currentTopic].name} Practice.<br>Your percentage is <b>${pct}%</b>.`; }
+function grid(ctx,w,h,scale=40){ ctx.clearRect(0,0,w,h); ctx.save(); ctx.translate(w/2,h/2); ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; for(let x=-w/2;x<=w/2;x+=scale){ctx.beginPath();ctx.moveTo(x,-h/2);ctx.lineTo(x,h/2);ctx.stroke()} for(let y=-h/2;y<=h/2;y+=scale){ctx.beginPath();ctx.moveTo(-w/2,y);ctx.lineTo(w/2,y);ctx.stroke()} ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=2; ctx.beginPath();ctx.moveTo(-w/2,0);ctx.lineTo(w/2,0);ctx.moveTo(0,-h/2);ctx.lineTo(0,h/2);ctx.stroke(); ctx.restore(); }
+function label(ctx,text,x,y,color='#fff',size=16){ctx.fillStyle=color;ctx.font=`900 ${size}px Trebuchet MS`;ctx.fillText(text,x,y)}
+function dot(ctx,x,y,color='#ffd166'){ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=color;ctx.fill()}
+function drawCircle(ctx,cx,cy,r,color){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=5;ctx.stroke();}
+function drawEllipseShape(ctx,cx,cy,rx,ry,color){ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=5;ctx.stroke();}
+function drawParabola(ctx,w,h,a=0.018,vx=0,vy=80,color='#80ed99'){ctx.save();ctx.translate(w/2,h/2);ctx.beginPath();for(let x=-240;x<=240;x++){let y=a*(x-vx)*(x-vx)+vy;if(x===-240)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.strokeStyle=color;ctx.lineWidth=5;ctx.stroke();ctx.restore()}
+function drawHyperbola(ctx,w,h,horiz=true,color='#bdb2ff'){ctx.save();ctx.translate(w/2,h/2);ctx.strokeStyle='rgba(255,209,102,.65)';ctx.setLineDash([8,8]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-260,-180);ctx.lineTo(260,180);ctx.moveTo(-260,180);ctx.lineTo(260,-180);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle=color;ctx.lineWidth=5; if(horiz){[-1,1].forEach(s=>{ctx.beginPath();for(let t=0;t<=220;t++){let x=s*(70+t);let y=0.55*Math.sqrt((x*x)-70*70); if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.beginPath();for(let t=0;t<=220;t++){let x=s*(70+t);let y=-0.55*Math.sqrt((x*x)-70*70); if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();});}else{[-1,1].forEach(s=>{ctx.beginPath();for(let t=0;t<=170;t++){let y=s*(55+t);let x=1.2*Math.sqrt((y*y)-55*55); if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.beginPath();for(let t=0;t<=170;t++){let y=s*(55+t);let x=-1.2*Math.sqrt((y*y)-55*55); if(t===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();});} ctx.restore();}
+function drawTopicGraph(kind){ const c=document.getElementById('topicCanvas'); if(!c)return; const ctx=c.getContext('2d'), w=c.width,h=c.height; grid(ctx,w,h,40); ctx.save(); ctx.translate(w/2,h/2); if(kind.includes('circle')){drawCircle(ctx,40,-40,120,'#4cc9f0'); dot(ctx,40,-40); ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(40,-40);ctx.lineTo(160,-40);ctx.stroke(); label(ctx,'center',50,-52,'#ffd166',15); label(ctx,'r',94,-52,'#ffd166',18);} if(kind.includes('parabola')){ctx.restore(); drawParabola(ctx,w,h,kind==='parabolaGraph'?-0.014:-0.018,0,kind==='parabolaGraph'?40:90,'#80ed99'); ctx.save();ctx.translate(w/2,h/2); dot(ctx,0,kind==='parabolaGraph'?40:90); label(ctx,'vertex',10,(kind==='parabolaGraph'?40:90)-12,'#ffd166',16); ctx.strokeStyle='rgba(255,209,102,.7)';ctx.setLineDash([7,7]);ctx.beginPath();ctx.moveTo(0,-190);ctx.lineTo(0,190);ctx.stroke();ctx.setLineDash([]);} if(kind.includes('ellipse')){drawEllipseShape(ctx,0,0,170,82,'#ff70a6'); dot(ctx,0,0); ctx.strokeStyle='#ffd166';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-170,0);ctx.lineTo(170,0);ctx.moveTo(0,-82);ctx.lineTo(0,82);ctx.stroke(); label(ctx,'major axis',-52,-12,'#ffd166',16); label(ctx,'center',10,22,'#ffd166',16);} if(kind.includes('hyperbola')){ctx.restore(); drawHyperbola(ctx,w,h,kind!=='hyperbolaGraph'?true:false,'#bdb2ff'); ctx.save();ctx.translate(w/2,h/2); dot(ctx,0,0); label(ctx,'center',10,-10,'#ffd166',16); label(ctx,'asymptotes',95,-100,'#ffd166',16);} ctx.restore(); }
+function drawMini(id,type){const c=document.getElementById(id); if(!c)return; const ctx=c.getContext('2d'),w=c.width,h=c.height; grid(ctx,w,h,25); ctx.save();ctx.translate(w/2,h/2); if(type==='circle')drawCircle(ctx,0,0,45,'#4cc9f0'); if(type==='ellipse')drawEllipseShape(ctx,0,0,65,34,'#ff70a6'); ctx.restore(); if(type==='parabola')drawParabola(ctx,w,h,-0.018,0,45,'#80ed99'); if(type==='hyperbola')drawHyperbola(ctx,w,h,true,'#bdb2ff');}
+function drawHero(){const c=document.getElementById('heroCanvas'); if(!c)return; const ctx=c.getContext('2d'), w=c.width,h=c.height; ctx.clearRect(0,0,w,h); ctx.save();ctx.translate(w/2,h/2); ctx.strokeStyle='rgba(255,255,255,.10)';ctx.lineWidth=1; for(let r=60;r<250;r+=42){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke()} ctx.rotate(-0.15); drawCircle(ctx,-105,-85,55,'#4cc9f0'); drawEllipseShape(ctx,92,-90,82,42,'#ff70a6'); ctx.restore(); drawParabola(ctx,w,h,-0.012,0,110,'#80ed99'); drawHyperbola(ctx,w,h,true,'#bdb2ff'); ctx.fillStyle='rgba(255,209,102,.95)';ctx.font='900 22px Trebuchet MS';ctx.fillText('CONICS',232,280); }
+function drawAbout(){const c=document.getElementById('aboutCanvas'); if(!c)return; const ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2+30);ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-120,-150);ctx.lineTo(0,20);ctx.lineTo(120,-150);ctx.stroke();ctx.beginPath();ctx.moveTo(-120,150);ctx.lineTo(0,20);ctx.lineTo(120,150);ctx.stroke();ctx.strokeStyle='#ffd166';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,-68,92,20,0,0,Math.PI*2);ctx.stroke();ctx.strokeStyle='#4cc9f0';ctx.beginPath();ctx.ellipse(0,48,120,30,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='rgba(255,255,255,.10)';ctx.beginPath();ctx.moveTo(-150,-70);ctx.lineTo(150,-110);ctx.lineTo(140,-70);ctx.lineTo(-140,-30);ctx.closePath();ctx.fill();ctx.restore();label(ctx,'Different slices create different curves.',115,395,'#c7d7ff',18)}
+function drawAll(){drawHero();drawAbout();drawMini('miniCircle','circle');drawMini('miniParabola','parabola');drawMini('miniEllipse','ellipse');drawMini('miniHyperbola','hyperbola'); if(document.getElementById('topic').classList.contains('active')){drawTopicGraph(topics[currentTopic].lessons[currentLesson].graph)} }
+window.addEventListener('load',()=>setTimeout(drawAll,100));
+window.addEventListener('resize',drawAll);
+</script>
+</body>
+</html>
